@@ -2,6 +2,7 @@ const imaps = require('imap-simple');
 const jwt = require('jsonwebtoken');
 var express = require('express');
 var router = express.Router();
+var models = require('./db/models');
 
 router.post('/login', function(req, res) {
     var rollnumber = req.body.Roll;
@@ -24,7 +25,7 @@ router.post('/login', function(req, res) {
         .connect(imapConfig)
         .then(connection => {
             res.json({
-                token: jwt.sign({user: rollnumber, password: password}, 'secret'),
+                token: jwt.sign({userId: rollnumber, password: password}, 'secret'),
                 status_code:200
             });
         })
@@ -39,14 +40,34 @@ router.post('/login', function(req, res) {
 router.use(function(req, res, next) {
     if (req.get('Token') !== undefined) {
         const decoded = jwt.decode(req.get('Token'), 'secret');
-        console.log(decoded);
+        if (decoded === null) {
+            res.json({
+                token:"",
+                status_code: 401
+            });
+        }
+        const user = models.User.findOne({
+            where: {
+                userId: decoded.userId
+            }
+        });
+        user.then(response => {
+            if (response.dataValues) {
+                req.user = response.dataValues;
+                next();
+            } else {
+                res.json({
+                    token:"",
+                    status_code: 401
+                });
+            }
+        });
     }
-    next();
 });
 
 router.get('/hello', function(req, res) {
     res.json({
-        helo: 'helo'
+        heli: req.user
     });
 });
 
