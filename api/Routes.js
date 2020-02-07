@@ -4,6 +4,24 @@ var express = require('express');
 var router = express.Router();
 var models = require('./db/models');
 
+function deg2rad(deg) {
+    return deg * (Math.PI/180)
+  }
+
+function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+    var R = 6371; // Radius of the earth in km
+    var dLat = deg2rad(lat2-lat1);  // deg2rad below
+    var dLon = deg2rad(lon2-lon1); 
+    var a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2)
+      ; 
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    var d = R * c; // Distance in km
+    return d;
+  }
+
 router.post('/login', function(req, res) {
     var rollnumber = req.body.Roll;
     var password = req.body.Password;
@@ -37,38 +55,53 @@ router.post('/login', function(req, res) {
         });
 });
 
-router.use(function(req, res, next) {
-    if (req.get('Token') !== undefined) {
-        const decoded = jwt.decode(req.get('Token'), 'secret');
-        if (decoded === null) {
-            res.json({
-                token:"",
-                status_code: 401
-            });
-        }
-        const user = models.User.findOne({
-            where: {
-                userId: decoded.userId
-            }
-        });
-        user.then(response => {
-            if (response.dataValues) {
-                req.user = response.dataValues;
-                next();
-            } else {
-                res.json({
-                    token:"",
-                    status_code: 401
-                });
-            }
-        });
-    }
-});
+// router.use(function(req, res, next) {
+//     if (req.get('Token') !== undefined) {
+//         const decoded = jwt.decode(req.get('Token'), 'secret');
+//         if (decoded === null) {
+//             res.json({
+//                 token:"",
+//                 status_code: 401
+//             });
+//         }
+//         const user = models.User.findOne({
+//             where: {
+//                 userId: decoded.userId
+//             }
+//         });
+//         user.then(response => {
+//             if (response.dataValues) {
+//                 req.user = response.dataValues;
+//                 next();
+//             } else {
+//                 res.json({
+//                     token:"",
+//                     status_code: 401
+//                 });
+//             }
+//         });
+//     }
+// });
 
-router.get('/hello', function(req, res) {
-    res.json({
-        heli: req.user
-    });
+router.get('/hello',function(req,res){
+    res.send('hello');
+})
+
+router.post('/getShops', function(req, res) {
+    var latitude = req.body.latitude
+    var longitude = req.body.longitude
+    var shops=models.User.findAll({
+        where:{
+            userType:'shop'
+        }
+    })
+    shops.then(response => {
+        let shops_ = JSON.parse(JSON.stringify(response));
+        shops_=shops_.sort((a,b)=>{
+            return getDistanceFromLatLonInKm(a.latitude,a.longitude,latitude,longitude)-getDistanceFromLatLonInKm(b.latitude,b.longitude,latitude,longitude)
+        })
+        res.json(shops_);
+    })
 });
 
 module.exports = router;
