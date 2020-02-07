@@ -31,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
             longitude: {
                 type: DataTypes.DOUBLE,
                 allowNull: true
-            },
+            }
         },
         {}
     );

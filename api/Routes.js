@@ -6,30 +6,26 @@ var models = require('./db/models');
 const Sequelize = require('sequelize');
 
 const deg2rad = deg => {
-    return deg * (Math.PI/180)
-}
+    return deg * (Math.PI / 180);
+};
 
-const getDistanceFromLatLonInKm = (lat1,lon1,lat2,lon2) => {
+const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
     var R = 6371; // Radius of the earth in km
-    var dLat = deg2rad(lat2-lat1);  // deg2rad below
-    var dLon = deg2rad(lon2-lon1); 
-    var a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2)
-      ; 
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    var dLat = deg2rad(lat2 - lat1); // deg2rad below
+    var dLon = deg2rad(lon2 - lon1);
+    var a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     var d = R * c; // Distance in km
     return d;
-}
+};
 
-const jsonify = data => JSON.parse(JSON.stringify(data))
+const jsonify = data => JSON.parse(JSON.stringify(data));
 
 router.post('/login', function(req, res) {
     var rollnumber = req.body.Roll;
     var password = req.body.Password;
-
-    console.log({rollnumber, password});
 
     const imapConfig = {
         imap: {
@@ -48,13 +44,13 @@ router.post('/login', function(req, res) {
             res.json({
                 token: jwt.sign({userId: rollnumber, password: password}, 'secret'),
                 // token: jwt.sign({userId: 'SCZ-07', password: 'password'}, 'secret'),
-                status_code:200
+                status_code: 200
             });
         })
         .catch(err => {
             res.json({
-                token:"",
-                status_code:503
+                token: '',
+                status_code: 503
             });
         });
 });
@@ -64,10 +60,10 @@ router.use(function(req, res, next) {
         const decoded = jwt.decode(req.body.token, 'secret');
         if (decoded === null) {
             res.json({
-                token:"Invalid token",
+                token: 'Invalid token',
                 status_code: 401
             });
-            return
+            return;
         }
         const user = models.User.findOne({
             where: {
@@ -75,46 +71,49 @@ router.use(function(req, res, next) {
             }
         });
         user.then(response => {
-            response = JSON.parse(JSON.stringify(response))
+            response = JSON.parse(JSON.stringify(response));
             if (response === null) {
                 res.json({
-                    token:"Invalid token",
+                    token: 'Invalid token',
                     status_code: 401
                 });
-                return
+                return;
             }
             req.user = response;
             next();
-            return
+            return;
         });
     } else {
         res.json({
-            token:"No token",
+            token: 'No token',
             status_code: 401
         });
-        return
+        return;
     }
 });
 
 router.post('/getShops', function(req, res) {
-    var latitude = req.body.latitude
-    var longitude = req.body.longitude
-    var shops=models.User.findAll({
-        where:{
-            userType:'shop'
+    var latitude = req.body.latitude;
+    var longitude = req.body.longitude;
+    var shops = models.User.findAll({
+        where: {
+            userType: 'shop'
         }
-    })
+    });
     shops.then(response => {
         let shops_ = json(response);
-        shops_=shops_.sort((a,b)=>{
-            return getDistanceFromLatLonInKm(a.latitude,a.longitude,latitude,longitude)-getDistanceFromLatLonInKm(b.latitude,b.longitude,latitude,longitude)
-        })
+        shops_ = shops_.sort((a, b) => {
+            return (
+                getDistanceFromLatLonInKm(a.latitude, a.longitude, latitude, longitude) -
+                getDistanceFromLatLonInKm(b.latitude, b.longitude, latitude, longitude)
+            );
+        });
         res.json(shops_);
-    })
+    });
 });
 
-router.post('/initiatePayment', function (req, res) {
-    const amount = parseFloat(req.body.amount)
+router.post('/initiatePayment', function(req, res) {
+    const amount = parseFloat(req.body.amount);
     models.User.findOne({
         where: {
             userId: req.body.toUser
@@ -123,30 +122,30 @@ router.post('/initiatePayment', function (req, res) {
         response = jsonify(response);
         if (response === null) {
             res.json({
-                token:"Invalid user id",
+                token: 'Invalid user id',
                 status_code: 401
             });
-            return
+            return;
         }
         const payment = models.Payment.create({
             fromId: req.user.id,
             toId: response.id,
             amount
-        })
+        });
         payment.then(resp => {
-            resp = jsonify(resp)
+            resp = jsonify(resp);
             res.json({
                 data: {
                     upiId: response.upiId,
                     orderId: resp.orderId,
                     status_code: 200
                 }
-            })
-        })
-    })
-})
+            });
+        });
+    });
+});
 
-router.post('/confirmPayment', function (req, res) {
+router.post('/confirmPayment', function(req, res) {
     const orderId = req.body.orderId;
     models.Payment.findOne({
         where: {
@@ -154,13 +153,13 @@ router.post('/confirmPayment', function (req, res) {
             toId: req.user.id
         }
     }).then(response => {
-        const order = jsonify(response)
+        const order = jsonify(response);
         if (order === null) {
             res.json({
-                token:"Invalid order id",
+                token: 'Invalid order id',
                 status_code: 401
             });
-            return
+            return;
         }
         if (!response.paid) {
             response.paid = true;
@@ -168,15 +167,15 @@ router.post('/confirmPayment', function (req, res) {
             response.save();
             res.json({
                 status_code: 200,
-                data: "Updated"
-            })
-            return
+                data: 'Updated'
+            });
+            return;
         }
         res.json({
             status_code: 401,
-            data: "Payment already confirmed"
-        })
-    })
-})
+            data: 'Payment already confirmed'
+        });
+    });
+});
 
 module.exports = router;
