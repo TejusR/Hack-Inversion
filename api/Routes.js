@@ -55,37 +55,42 @@ router.post('/login', function(req, res) {
         });
 });
 
-// router.use(function(req, res, next) {
-//     if (req.get('Token') !== undefined) {
-//         const decoded = jwt.decode(req.get('Token'), 'secret');
-//         if (decoded === null) {
-//             res.json({
-//                 token:"",
-//                 status_code: 401
-//             });
-//         }
-//         const user = models.User.findOne({
-//             where: {
-//                 userId: decoded.userId
-//             }
-//         });
-//         user.then(response => {
-//             if (response.dataValues) {
-//                 req.user = response.dataValues;
-//                 next();
-//             } else {
-//                 res.json({
-//                     token:"",
-//                     status_code: 401
-//                 });
-//             }
-//         });
-//     }
-// });
-
-router.get('/hello',function(req,res){
-    res.send('hello');
-})
+router.use(function(req, res, next) {
+    if (req.body.token !== undefined) {
+        const decoded = jwt.decode(req.body.token, 'secret');
+        if (decoded === null) {
+            res.json({
+                token:"Invalid token",
+                status_code: 401
+            });
+            return
+        }
+        const user = models.User.findOne({
+            where: {
+                userId: decoded.userId
+            }
+        });
+        user.then(response => {
+            response = JSON.parse(JSON.stringify(response))
+            if (response === null) {
+                res.json({
+                    token:"Invalid token",
+                    status_code: 401
+                });
+                return
+            }
+            req.user = response;
+            next();
+            return
+        });
+    } else {
+        res.json({
+            token:"No token",
+            status_code: 401
+        });
+        return
+    }
+});
 
 router.post('/getShops', function(req, res) {
     var latitude = req.body.latitude
