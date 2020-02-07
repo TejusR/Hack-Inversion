@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 var express = require('express');
 var router = express.Router();
 var models = require('./db/models');
+const Sequelize = require('sequelize');
 
 const deg2rad = deg => {
     return deg * (Math.PI/180)
@@ -46,6 +47,7 @@ router.post('/login', function(req, res) {
         .then(connection => {
             res.json({
                 token: jwt.sign({userId: rollnumber, password: password}, 'secret'),
+                // token: jwt.sign({userId: 'SCZ-07', password: 'password'}, 'secret'),
                 status_code:200
             });
         })
@@ -112,7 +114,6 @@ router.post('/getShops', function(req, res) {
 });
 
 router.post('/initiatePayment', function (req, res) {
-    const fromUser = req.user;
     const amount = parseFloat(req.body.amount)
     models.User.findOne({
         where: {
@@ -127,18 +128,53 @@ router.post('/initiatePayment', function (req, res) {
             });
             return
         }
-        const payment = models.Payment.build({
-            fromId: fromUser.id,
+        const payment = models.Payment.create({
+            fromId: req.user.id,
             toId: response.id,
             amount
         })
-        payment.save();
+        payment.then(resp => {
+            resp = jsonify(resp)
+            res.json({
+                data: {
+                    upiId: response.upiId,
+                    orderId: resp.orderId,
+                    status_code: 200
+                }
+            })
+        })
+    })
+})
+
+router.post('/confirmPayment', function (req, res) {
+    const orderId = req.body.orderId;
+    models.Payment.findOne({
+        where: {
+            orderId,
+            toId: req.user.id
+        }
+    }).then(response => {
+        const order = jsonify(response)
+        if (order === null) {
+            res.json({
+                token:"Invalid order id",
+                status_code: 401
+            });
+            return
+        }
+        if (!response.paid) {
+            response.paid = true;
+            response.paymentEnd = new Date();
+            response.save();
+            res.json({
+                status_code: 200,
+                data: "Updated"
+            })
+            return
+        }
         res.json({
-            data: {
-                upiId: response.upiId,
-                orderId: payment.orderId,
-                status_code: 200
-            }
+            status_code: 401,
+            data: "Payment already confirmed"
         })
     })
 })
