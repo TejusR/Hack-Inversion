@@ -9,6 +9,7 @@ app.use(bodyParser.json());
 app.use(cors({
 	credentials: true,
 }));
+
 app.use(routes)
 app.get('/', (req, res) => {
   res.send('Hello World!')
