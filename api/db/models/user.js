@@ -19,7 +19,19 @@ module.exports = (sequelize, DataTypes) => {
             userId: {
                 type: DataTypes.STRING,
                 allowNull: false
-            }
+            },
+            userType: {
+                type: DataTypes.STRING,
+                allowNull: false
+            },
+            latitude: {
+                type: DataTypes.DOUBLE,
+                allowNull: true
+            },
+            longitude: {
+                type: DataTypes.DOUBLE,
+                allowNull: true
+            },
         },
         {}
     );
