@@ -1,0 +1,49 @@
+'use strict';
+module.exports = (sequelize, DataTypes) => {
+    const Payment = sequelize.define(
+        'Payment',
+        {
+            id: {
+                type: DataTypes.INTEGER,
+                autoIncrement: true,
+                primaryKey: true
+            },
+            orderId: {
+                type: DataTypes.UUID,
+                defaultValue: DataTypes.UUIDV4,
+                primaryKey: false
+            },
+            fromId: {
+                type: DataTypes.INTEGER,
+                references: {
+                    model: 'Users',
+                    key: 'id'
+                }
+            },
+            toId: {
+                type: DataTypes.INTEGER,
+                references: {
+                    model: 'Users',
+                    key: 'id'
+                }
+            },
+            paid: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false
+            },
+            paymentInit: {
+                type: DataTypes.DATE,
+                defaultValue: DataTypes.NOW
+            },
+            paymentEnd: {
+                type: DataTypes.DATE,
+                allowNull: true
+            }
+        },
+        {}
+    );
+    Payment.associate = function(models) {
+        // associations can be defined here
+    };
+    return Payment;
+};
