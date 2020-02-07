@@ -27,6 +27,10 @@ module.exports = (sequelize, DataTypes) => {
                     key: 'id'
                 }
             },
+            amount: {
+                type: DataTypes.FLOAT,
+                defaultValue: 0
+            },
             paid: {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false

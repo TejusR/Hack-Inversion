@@ -4,11 +4,11 @@ var express = require('express');
 var router = express.Router();
 var models = require('./db/models');
 
-function deg2rad(deg) {
+const deg2rad = deg => {
     return deg * (Math.PI/180)
-  }
+}
 
-function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+const getDistanceFromLatLonInKm = (lat1,lon1,lat2,lon2) => {
     var R = 6371; // Radius of the earth in km
     var dLat = deg2rad(lat2-lat1);  // deg2rad below
     var dLon = deg2rad(lon2-lon1); 
@@ -20,7 +20,9 @@ function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
     var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
     var d = R * c; // Distance in km
     return d;
-  }
+}
+
+const jsonify = data => JSON.parse(JSON.stringify(data))
 
 router.post('/login', function(req, res) {
     var rollnumber = req.body.Roll;
@@ -101,12 +103,44 @@ router.post('/getShops', function(req, res) {
         }
     })
     shops.then(response => {
-        let shops_ = JSON.parse(JSON.stringify(response));
+        let shops_ = json(response);
         shops_=shops_.sort((a,b)=>{
             return getDistanceFromLatLonInKm(a.latitude,a.longitude,latitude,longitude)-getDistanceFromLatLonInKm(b.latitude,b.longitude,latitude,longitude)
         })
         res.json(shops_);
     })
 });
+
+router.post('/initiatePayment', function (req, res) {
+    const fromUser = req.user;
+    const amount = parseFloat(req.body.amount)
+    models.User.findOne({
+        where: {
+            userId: req.body.toUser
+        }
+    }).then(response => {
+        response = jsonify(response);
+        if (response === null) {
+            res.json({
+                token:"Invalid user id",
+                status_code: 401
+            });
+            return
+        }
+        const payment = models.Payment.build({
+            fromId: fromUser.id,
+            toId: response.id,
+            amount
+        })
+        payment.save();
+        res.json({
+            data: {
+                upiId: response.upiId,
+                orderId: payment.orderId,
+                status_code: 200
+            }
+        })
+    })
+})
 
 module.exports = router;
