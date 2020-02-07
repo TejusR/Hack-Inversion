@@ -24,11 +24,15 @@ router.post('/login', function(req, res) {
         .connect(imapConfig)
         .then(connection => {
             res.json({
-                token: jwt.sign({user: rollnumber, password: password}, 'secret')
+                token: jwt.sign({user: rollnumber, password: password}, 'secret'),
+                status_code:200
             });
         })
         .catch(err => {
-            res.send('Wrong Credentials!');
+            res.json({
+                token:"",
+                status_code:503
+            });
         });
 });
 
