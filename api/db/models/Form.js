@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false
             },
             Required: {
-                type: Sequelize.TEXT,
+                type: DataTypes.TEXT,
                 get: function () {
                     return JSON.parse(this.getDataValue('value'));
                 },
