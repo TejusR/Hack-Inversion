@@ -204,4 +204,21 @@ router.get('/payments', function (req, res) {
     })
 })
 
+router.get("/getForms",(req,res)=>{
+    var forms=models.Form.findAll();
+    forms.then(response => {
+        let forms_=jsonify(response);
+        res.json(forms);
+    })
+});
+
+router.post("/createForm",(req,res)=>{
+    models.Form.create({
+        name:"test form",
+        Required:"jhglhnjdshof",
+        links:"kugshkfgkds"
+    });
+    res.send("hgshd");
+})
+
 module.exports = router;
