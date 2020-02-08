@@ -42,6 +42,17 @@ module.exports = (sequelize, DataTypes) => {
             paymentEnd: {
                 type: DataTypes.DATE,
                 allowNull: true
+            },
+            metaData: {
+                type: DataTypes.TEXT,
+                allowNull: true,
+                get: function() {
+                    if (this.getDataValue('metaData')) return JSON.parse(this.getDataValue('metaData'));
+                    return null;
+                },
+                set: function(value) {
+                    this.setDataValue('metaData', JSON.stringify(value));
+                }
             }
         },
         {

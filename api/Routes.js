@@ -426,4 +426,6 @@ router.post('/acceptUserForm',function(req,res){
     }
 })
 
+router.post('/payment')
+
 module.exports = router;
