@@ -23,8 +23,7 @@ module.exports = (sequelize, Sequelize) => {
             submitted: {
                 type: Sequelize.TEXT,
                 get: function() {
-                    if (this.getDataValue('submitted'))
-                        return JSON.parse(this.getDataValue('submitted'));
+                    if (this.getDataValue('submitted')) return JSON.parse(this.getDataValue('submitted'));
                     return null;
                 },
                 set: function(value) {
@@ -39,7 +38,7 @@ module.exports = (sequelize, Sequelize) => {
             verified: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: false
-            },
+            }
         },
         {
             freezeTableName: true,

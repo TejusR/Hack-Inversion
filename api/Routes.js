@@ -17,8 +17,9 @@ var upload = multer({
         s3: s3,
         bucket: 'kira99-static',
         key: function(req, file, cb) {
-            req.file = file;
+            file.originalname = `${new Date().getTime()}${file.originalname}`;
             cb(null, file.originalname);
+            req.file = file;
         }
     })
 });
@@ -229,7 +230,7 @@ router.get('/getForms', (req, res) => {
 });
 
 router.post('/createForms', (req, res) => {
-    console.log(req.user)
+    console.log(req.user);
     if (req.user.userType == 'admin') {
         name = req.body.name;
         Required = JSON.parse(req.body.required);
@@ -251,10 +252,10 @@ router.post('/createForms', (req, res) => {
         });
     }
 });
-router.post('/specificForm',(req,res)=>{
+router.post('/specificForm', (req, res) => {
     models.Form.findAll({
-        where:{
-            id:req.body.id
+        where: {
+            id: req.body.id
         }
     }).then(response => {
         let forms = jsonify(response);
@@ -262,7 +263,51 @@ router.post('/specificForm',(req,res)=>{
     });
 });
 
-router.post('/updateForm', function(req, res) {
-    res.send('hello');
+router.post('/initiateUserForm', function(req, res) {
+    models.UserForm.create({
+        formid: req.body.formId,
+        userid: req.user.id
+    }).then(form => {
+        form = jsonify(form);
+        res.json({form});
+    });
 });
+
+router.post('/updateForm', function(req, res) {
+    models.UserForm.findOne({
+        where: {
+            id: req.body.formId
+        }
+    }).then(userForm => {
+        let form = jsonify(userForm);
+        models.Form.findOne({
+            where: {
+                id: form.formid
+            }
+        }).then(resp => {
+            resp = jsonify(resp);
+            let criteria = resp.Required.filter(r => r.name === req.body.name)[0];
+            let found = false;
+            if (form.submitted === null) form.submitted = [];
+            for (let crit of form.submitted) {
+                if (crit.name === req.body.name) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+                form.submitted.push({
+                    ...criteria,
+                    link: req.file.originalname
+                });
+            userForm.submitted = form.submitted;
+            if (userForm.submitted.length === resp.Required.length) userForm.completed = true;
+            userForm.save();
+            res.json({
+                form: jsonify(userForm)
+            });
+        });
+    });
+});
+
 module.exports = router;
