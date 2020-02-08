@@ -76,7 +76,18 @@ router.post('/login', function(req, res) {
 router.get('/getForms', (req, res) => {
     models.Form.findAll().then(response => {
         let forms = jsonify(response);
-        res.json({forms});
+        res.json(forms);
+    });
+});
+
+router.post('/specificForm', (req, res) => {
+    models.Form.findOne({
+        where: {
+            id: req.body.id
+        }
+    }).then(response => {
+        let forms = jsonify(response);
+        res.json(forms);
     });
 });
 
@@ -251,16 +262,6 @@ router.post('/createForms', (req, res) => {
             status_code: 401
         });
     }
-});
-router.post('/specificForm', (req, res) => {
-    models.Form.findAll({
-        where: {
-            id: req.body.id
-        }
-    }).then(response => {
-        let forms = jsonify(response);
-        res.json({forms});
-    });
 });
 
 router.post('/initiateUserForm', function(req, res) {
