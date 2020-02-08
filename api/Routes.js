@@ -291,6 +291,10 @@ router.post('/updateForm', function(req, res) {
             if (form.submitted === null) form.submitted = [];
             for (let crit of form.submitted) {
                 if (crit.name === req.body.name) {
+                    s3.deleteObject({
+                        Bucket: 'kira99-static',
+                        Key: req.file.originalname
+                    }, (err, data) => {})
                     found = true;
                     break;
                 }

@@ -1,8 +1,7 @@
 'use strict';
-module.exports = (sequelize, Sequelize) => {
-    const UserForm = sequelize.define(
-        'UserForm',
-        {
+module.exports = {
+    up: (queryInterface, Sequelize) => {
+        return queryInterface.createTable('UserForm', {
             id: {
                 type: Sequelize.INTEGER,
                 autoIncrement: true,
@@ -43,14 +42,9 @@ module.exports = (sequelize, Sequelize) => {
                 type: Sequelize.BOOLEAN,
                 defaultValue: false
             }
-        },
-        {
-            freezeTableName: true,
-            tableName: 'UserForm'
-        }
-    );
-    UserForm.associate = function(models) {
-        // associations can be defined here
-    };
-    return UserForm;
+        });
+    },
+    down: (queryInterface, Sequelize) => {
+        return queryInterface.dropTable('Users');
+    }
 };

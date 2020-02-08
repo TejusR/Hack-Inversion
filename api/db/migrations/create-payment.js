@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
     up: (queryInterface, Sequelize) => {
-        return queryInterface.createTable('Payments', {
+        return queryInterface.createTable('Payment', {
             id: {
                 type: Sequelize.INTEGER,
                 autoIncrement: true,
@@ -26,6 +26,10 @@ module.exports = {
                     key: 'id'
                 }
             },
+            amount: {
+                type: Sequelize.FLOAT,
+                defaultValue: 0
+            },
             paid: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: false
@@ -37,18 +41,10 @@ module.exports = {
             paymentEnd: {
                 type: Sequelize.DATE,
                 allowNull: true
-            },
-            createdAt: {
-                allowNull: false,
-                type: Sequelize.DATE
-            },
-            updatedAt: {
-                allowNull: false,
-                type: Sequelize.DATE
             }
         });
     },
     down: (queryInterface, Sequelize) => {
-        return queryInterface.dropTable('Payments');
+        return queryInterface.dropTable('Users');
     }
 };
