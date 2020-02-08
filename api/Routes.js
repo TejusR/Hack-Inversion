@@ -174,7 +174,6 @@ router.post('/initiatePayment', function(req, res) {
             resp = jsonify(resp);
             res.json({
                 data: {
-                    upiId: response.upiId,
                     orderId: resp.orderId,
                     status_code: 200
                 }

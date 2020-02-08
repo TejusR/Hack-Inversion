@@ -32,6 +32,10 @@ module.exports = (sequelize, DataTypes) => {
             longitude: {
                 type: DataTypes.DOUBLE,
                 allowNull: true
+            },
+            wallet: {
+                type: DataTypes.FLOAT,
+                defaultValue: 0,
             }
         },
         {
