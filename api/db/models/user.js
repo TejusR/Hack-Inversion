@@ -32,6 +32,15 @@ module.exports = (sequelize, DataTypes) => {
             longitude: {
                 type: DataTypes.DOUBLE,
                 allowNull: true
+            },
+            createdAt: {
+                allowNull: false,
+                type: DataTypes.DATE,
+                defaultValue: Sequelize.NOW()
+            },
+            updatedAt: {
+                allowNull: false,
+                type: DataTypes.DATE
             }
         },
         {}

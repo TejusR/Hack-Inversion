@@ -29,6 +29,15 @@ module.exports = (sequelize, DataTypes) => {
                 set: function(value) {
                     this.setDataValue('links', JSON.stringify(value));
                 }
+            },
+            createdAt: {
+                allowNull: false,
+                type: DataTypes.DATE,
+                defaultValue: Sequelize.NOW()
+            },
+            updatedAt: {
+                allowNull: false,
+                type: DataTypes.DATE
             }
         },
         {
