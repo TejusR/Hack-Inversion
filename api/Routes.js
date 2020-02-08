@@ -73,6 +73,13 @@ router.post('/login', function(req, res) {
         });
 });
 
+router.get('/getForms', (req, res) => {
+    models.Form.findAll().then(response => {
+        let forms = jsonify(response);
+        res.json({forms});
+    });
+});
+
 router.use(upload.array('file', 1), function(req, res, next) {
     if (req.body.token !== undefined) {
         // || req.get('token') !== undefined
@@ -222,13 +229,6 @@ router.get('/payments', function(req, res) {
     });
 });
 
-router.get('/getForms', (req, res) => {
-    models.Form.findAll().then(response => {
-        let forms = jsonify(response);
-        res.json({forms});
-    });
-});
-
 router.post('/createForms', (req, res) => {
     console.log(req.user);
     if (req.user.userType == 'admin') {
@@ -297,7 +297,9 @@ router.post('/updateForm', function(req, res) {
             }
         }).then(resp => {
             resp = jsonify(resp);
+            console.log(resp);
             let criteria = resp.Required.filter(r => r.name === req.body.name);
+            console.log(criteria);
             if (criteria.length === 0) {
                 res.json({
                     status_code: 401,
@@ -374,5 +376,54 @@ router.post('/getIncompleteForms', function(req, res) {
         });
     });
 });
+
+router.post('/showCompleted',function(req,res){
+    if(req.user.userType=='admin')
+    {
+        models.UserForm.findAll({
+            where:{
+                completed:true,
+                verified:false
+            }
+        }).then((response) => {
+            res.json({
+                status_code:200,
+                data:jsonify(response)
+            })
+        })
+    }
+    else
+    {
+        res.send("Unauthorized")
+    }
+})
+
+router.post('/acceptUserForm',function(req,res){
+    if(req.user.userType=='admin')
+    {
+        models.UserForm.findOne({
+            where:{
+                id:req.body.id
+            }
+        }).then((response) => {
+            var form=jsonify(response)
+            if(form.completed==true)
+            {
+                response.verified=true
+                response.save()
+                res.json({
+                    status_code:200
+                })
+            }
+            else{
+                res.send("Complete the Form")
+            }
+        })
+    }
+    else
+    {
+        res.send("Unauthorized")
+    }
+})
 
 module.exports = router;
