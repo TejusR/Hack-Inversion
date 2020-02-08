@@ -212,13 +212,23 @@ router.get("/getForms",(req,res)=>{
     })
 });
 
-router.post("/createForm",(req,res)=>{
-    models.Form.create({
-        name:"test form",
-        Required:"jhglhnjdshof",
-        links:"kugshkfgkds"
-    });
-    res.send("hgshd");
+router.post("/createForms",(req,res)=>{
+    if(req.user.userType=='admin')
+    {
+        name=req.body.name;
+        Required=JSON.parse(req.body.required);
+        links=JSON.parse(req.body.link);
+        models.Form.create({
+            name,
+            Required,
+            links
+        }).then(() =>{
+            res.send('Success');
+        })
+    }
+    else
+    {
+        res.send('Unauthorized')
+    }
 })
-
 module.exports = router;
