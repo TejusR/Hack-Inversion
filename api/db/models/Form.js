@@ -18,7 +18,6 @@ module.exports = (sequelize, DataTypes) => {
                     return JSON.parse(this.getDataValue('Required'));
                 },
                 set: function(value) {
-                    console.log(value);
                     this.setDataValue('Required', JSON.stringify(value));
                 }
             },
@@ -28,7 +27,6 @@ module.exports = (sequelize, DataTypes) => {
                     return JSON.parse(this.getDataValue('links'));
                 },
                 set: function(value) {
-                    console.log(value);
                     this.setDataValue('links', JSON.stringify(value));
                 }
             }

@@ -22,10 +22,29 @@ module.exports = (sequelize, Sequelize) => {
             },
             submitted: {
                 type: Sequelize.TEXT,
-                allowNull: false
-            }
+                get: function() {
+                    if (this.getDataValue('submitted'))
+                        return JSON.parse(this.getDataValue('submitted'));
+                    return null;
+                },
+                set: function(value) {
+                    this.setDataValue('submitted', JSON.stringify(value));
+                },
+                allowNull: true
+            },
+            completed: {
+                type: Sequelize.BOOLEAN,
+                defaultValue: false
+            },
+            verified: {
+                type: Sequelize.BOOLEAN,
+                defaultValue: false
+            },
         },
-        {}
+        {
+            freezeTableName: true,
+            tableName: 'UserForm'
+        }
     );
     UserForm.associate = function(models) {
         // associations can be defined here
