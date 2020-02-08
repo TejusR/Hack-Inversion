@@ -93,6 +93,7 @@ router.use(function(req, res, next) {
 });
 
 router.post('/getShops', function(req, res) {
+    console.log(req.body.token)
     var latitude = req.body.latitude;
     var longitude = req.body.longitude;
     var shops = models.User.findAll({
