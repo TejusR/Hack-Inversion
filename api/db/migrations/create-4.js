@@ -1,46 +1,46 @@
 'use strict';
 module.exports = {
     up: (queryInterface, Sequelize) => {
-        return queryInterface.createTable('Payment', {
+        return queryInterface.createTable('UserForm', {
             id: {
                 type: Sequelize.INTEGER,
                 autoIncrement: true,
                 primaryKey: true
             },
-            orderId: {
-                type: Sequelize.UUID,
-                defaultValue: Sequelize.UUIDV4,
-                primaryKey: false
-            },
-            fromId: {
+            formid: {
                 type: Sequelize.INTEGER,
+                allowNull: false,
+                references: {
+                    model: 'Form',
+                    key: 'id'
+                }
+            },
+            userid: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
                 references: {
                     model: 'Users',
                     key: 'id'
                 }
             },
-            toId: {
-                type: Sequelize.INTEGER,
-                references: {
-                    model: 'Users',
-                    key: 'id'
-                }
+            submitted: {
+                type: Sequelize.TEXT,
+                get: function() {
+                    if (this.getDataValue('submitted')) return JSON.parse(this.getDataValue('submitted'));
+                    return null;
+                },
+                set: function(value) {
+                    this.setDataValue('submitted', JSON.stringify(value));
+                },
+                allowNull: true
             },
-            amount: {
-                type: Sequelize.FLOAT,
-                defaultValue: 0
-            },
-            paid: {
+            completed: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: false
             },
-            paymentInit: {
-                type: Sequelize.DATE,
-                defaultValue: Sequelize.NOW
-            },
-            paymentEnd: {
-                type: Sequelize.DATE,
-                allowNull: true
+            verified: {
+                type: Sequelize.BOOLEAN,
+                defaultValue: false
             }
         });
     },

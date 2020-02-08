@@ -3,16 +3,16 @@ module.exports = {
     up: (queryInterface, Sequelize) => {
         return queryInterface.createTable('Form', {
             id: {
-                type: DataTypes.INTEGER,
+                type: Sequelize.INTEGER,
                 autoIncrement: true,
                 primaryKey: true
             },
             name: {
-                type: DataTypes.STRING,
+                type: Sequelize.STRING,
                 allowNull: false
             },
             Required: {
-                type: DataTypes.TEXT,
+                type: Sequelize.TEXT,
                 get: function() {
                     return JSON.parse(this.getDataValue('Required'));
                 },
@@ -21,7 +21,7 @@ module.exports = {
                 }
             },
             links: {
-                type: DataTypes.TEXT,
+                type: Sequelize.TEXT,
                 get: function() {
                     return JSON.parse(this.getDataValue('links'));
                 },
