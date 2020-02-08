@@ -22,7 +22,8 @@ module.exports = (sequelize, DataTypes) => {
             },
             userType: {
                 type: DataTypes.STRING,
-                allowNull: false
+                allowNull: false,
+                defaultValue: 'student'
             },
             latitude: {
                 type: DataTypes.DOUBLE,

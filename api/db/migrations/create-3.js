@@ -41,6 +41,15 @@ module.exports = {
             paymentEnd: {
                 type: Sequelize.DATE,
                 allowNull: true,
+            },
+            createdAt: {
+                allowNull: false,
+                type: Sequelize.DATE,
+                defaultValue: Sequelize.NOW()
+            },
+            updatedAt: {
+                allowNull: false,
+                type: Sequelize.DATE
             }
         });
     },

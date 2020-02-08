@@ -19,6 +19,11 @@ module.exports = {
                 type: Sequelize.STRING,
                 allowNull: false
             },
+            userType: {
+                type: Sequelize.STRING,
+                allowNull: false,
+                defaultValue: 'student'
+            },
             createdAt: {
                 allowNull: false,
                 type: Sequelize.DATE,
