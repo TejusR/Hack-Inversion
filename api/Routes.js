@@ -5,7 +5,7 @@ var router = express.Router();
 var models = require('./db/models');
 var multer = require('multer'); // "multer": "^1.1.0"
 var multerS3 = require('multer-s3'); //"^1.4.1"
-var aws = require('aws-sdk')
+var aws = require('aws-sdk');
 aws.config.update({
     secretAccessKey: 'qp4TSOYxjicVixtn1Hw+RMBttbI0ZE+KR7El3Yj+',
     accessKeyId: 'AKIATII432WFCX2QSJWK',
@@ -16,8 +16,9 @@ var upload = multer({
     storage: multerS3({
         s3: s3,
         bucket: 'kira99-static',
-        key: function (req, file, cb) {
-            cb(null, file.originalname); //use Date.now() for unique file keys
+        key: function(req, file, cb) {
+            req.file = file;
+            cb(null, file.originalname);
         }
     })
 });
@@ -221,35 +222,37 @@ router.get('/payments', function(req, res) {
 });
 
 router.get('/getForms', (req, res) => {
-    var forms = models.Form.findAll();
-    forms.then(response => {
-        let forms_ = jsonify(response);
-        res.json(forms);
+    models.Form.findAll().then(response => {
+        let forms = jsonify(response);
+        res.json({forms});
     });
 });
 
-router.post("/createForms",(req,res)=>{
-    if(req.user.userType=='admin')
-    {
-        name=req.body.name;
-        Required=JSON.parse(req.body.required);
-        links=JSON.parse(req.body.link);
+router.post('/createForms', (req, res) => {
+    console.log(req.user)
+    if (req.user.userType == 'admin') {
+        name = req.body.name;
+        Required = JSON.parse(req.body.required);
+        links = JSON.parse(req.body.link);
         models.Form.create({
             name,
             Required,
             links
-        }).then(() =>{
-            res.send('Success');
-        })
+        }).then(resp => {
+            res.json({
+                status_code: 200,
+                form: jsonify(resp)
+            });
+        });
+    } else {
+        res.json({
+            data: 'Unauthorized',
+            status_code: 401
+        });
     }
-    else
-    {
-        res.send('Unauthorized')
-    }
-})
+});
 
-
-router.post('/postForm', function(req, res) {
-    res.send('hello')
-})
+router.post('/updateForm', function(req, res) {
+    res.send('hello');
+});
 module.exports = router;

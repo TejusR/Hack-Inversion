@@ -21,7 +21,7 @@ module.exports = (sequelize, Sequelize) => {
                 allowNull: true
             },
             submitted: {
-                type: Sequelize.STRING,
+                type: Sequelize.TEXT,
                 allowNull: false
             }
         },

@@ -3,10 +3,10 @@ module.exports = {
     up: (queryInterface, Sequelize) => {
         return queryInterface.changeColumn('Form', 'links', {
             type: Sequelize.TEXT,
-            get: function () {
+            get: function() {
                 return JSON.parse(this.getDataValue('value'));
             },
-            set: function (value) {
+            set: function(value) {
                 this.setDataValue('value', JSON.stringify(value));
             }
         });

@@ -14,20 +14,20 @@ module.exports = (sequelize, DataTypes) => {
             },
             Required: {
                 type: DataTypes.TEXT,
-                get: function () {
+                get: function() {
                     return JSON.parse(this.getDataValue('Required'));
                 },
-                set: function (value) {
+                set: function(value) {
                     console.log(value);
                     this.setDataValue('Required', JSON.stringify(value));
                 }
             },
             links: {
                 type: DataTypes.TEXT,
-                get: function () {
+                get: function() {
                     return JSON.parse(this.getDataValue('links'));
                 },
-                set: function (value) {
+                set: function(value) {
                     console.log(value);
                     this.setDataValue('links', JSON.stringify(value));
                 }
