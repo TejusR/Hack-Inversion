@@ -3,12 +3,28 @@ const jwt = require('jsonwebtoken');
 var express = require('express');
 var router = express.Router();
 var models = require('./db/models');
-const Sequelize = require('sequelize');
+var multer = require('multer'); // "multer": "^1.1.0"
+var multerS3 = require('multer-s3'); //"^1.4.1"
+var aws = require('aws-sdk')
+aws.config.update({
+    secretAccessKey: 'qp4TSOYxjicVixtn1Hw+RMBttbI0ZE+KR7El3Yj+',
+    accessKeyId: 'AKIATII432WFCX2QSJWK',
+    region: 'ap-south-1'
+});
+var s3 = new aws.S3();
+var upload = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: 'kira99-static',
+        key: function (req, file, cb) {
+            cb(null, file.originalname); //use Date.now() for unique file keys
+        }
+    })
+});
 
 const deg2rad = deg => {
     return deg * (Math.PI / 180);
 };
-
 const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
     var R = 6371; // Radius of the earth in km
     var dLat = deg2rad(lat2 - lat1); // deg2rad below
@@ -55,8 +71,10 @@ router.post('/login', function(req, res) {
         });
 });
 
-router.use(function(req, res, next) {
+router.use(upload.array('file', 1), function(req, res, next) {
     if (req.body.token !== undefined) {
+        // || req.get('token') !== undefined
+        // || req.get('token')
         const decoded = jwt.decode(req.body.token, 'secret');
         if (decoded === null) {
             res.json({
@@ -93,7 +111,6 @@ router.use(function(req, res, next) {
 });
 
 router.post('/getShops', function(req, res) {
-    console.log(req.body.token)
     var latitude = req.body.latitude;
     var longitude = req.body.longitude;
     var shops = models.User.findAll({
@@ -179,14 +196,13 @@ router.post('/confirmPayment', function(req, res) {
     });
 });
 
-
-router.get('/payments', function (req, res) {
+router.get('/payments', function(req, res) {
     models.Payment.findAll({
         where: {
             fromId: req.user.id
         }
     }).then(sent => {
-        sent = jsonify(sent)
+        sent = jsonify(sent);
         models.Payment.findAll({
             where: {
                 toId: req.user.id
@@ -199,17 +215,17 @@ router.get('/payments', function (req, res) {
                     received
                 },
                 status_code: 200
-            })
-        })
-    })
-})
+            });
+        });
+    });
+});
 
-router.get("/getForms",(req,res)=>{
-    var forms=models.Form.findAll();
+router.get('/getForms', (req, res) => {
+    var forms = models.Form.findAll();
     forms.then(response => {
-        let forms_=jsonify(response);
+        let forms_ = jsonify(response);
         res.json(forms);
-    })
+    });
 });
 
 router.post("/createForms",(req,res)=>{
@@ -230,5 +246,10 @@ router.post("/createForms",(req,res)=>{
     {
         res.send('Unauthorized')
     }
+})
+
+
+router.post('/postForm', function(req, res) {
+    res.send('hello')
 })
 module.exports = router;

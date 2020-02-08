@@ -4,15 +4,15 @@ var express = require('express');
 var router = express.Router();
 var models = require('./db/models');
 
-router.get("/getForms",(req,res)=>{
-    var forms=models.Form.findAll();
+router.get('/getForms', (req, res) => {
+    var forms = models.Form.findAll();
     res.json(forms);
 });
-router.post("/createForm",(req,res)=>{
+router.post('/createForm', (req, res) => {
     models.Form.create({
-        name:"test form",
-        Required:"jhglhnjdshof",
-        links:"kugshkfgkds"
+        name: 'test form',
+        Required: 'jhglhnjdshof',
+        links: 'kugshkfgkds'
     });
-    res.send("hgshd");
-})
+    res.send('hgshd');
+});
