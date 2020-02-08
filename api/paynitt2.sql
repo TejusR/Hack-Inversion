@@ -18,7 +18,7 @@
 --
 -- Table structure for table `Form`
 --
-USE paynitt;
+USE paynitt_wallet;
 DROP TABLE IF EXISTS `Form`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -88,8 +88,8 @@ CREATE TABLE `Payments` (
   `paid` tinyint(1) DEFAULT '0',
   `paymentInit` datetime DEFAULT NULL,
   `paymentEnd` datetime DEFAULT NULL,
-  `createdAt` datetime NOT NULL,
-  `updatedAt` datetime NOT NULL,
+  `createdAt` datetime,
+  `updatedAt` datetime,
   `amount` float DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `fromId` (`fromId`),

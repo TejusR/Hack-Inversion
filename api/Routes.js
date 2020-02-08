@@ -92,6 +92,7 @@ router.post('/specificForm', (req, res) => {
 });
 
 router.use(upload.array('file', 1), function(req, res, next) {
+    console.log(`===================${req.url}====================`);
     if (req.body.token !== undefined) {
         // || req.get('token') !== undefined
         // || req.get('token')
@@ -274,6 +275,7 @@ router.post('/initiateUserForm', function(req, res) {
 });
 
 router.post('/updateForm', function(req, res) {
+    console.log('Maluma');
     if (req.body.name === 'Payment') {
         s3.deleteObject(
             {
@@ -390,6 +392,60 @@ router.post('/acceptUserForm',function(req,res){
     }
 })
 
-router.post('/payment')
+router.post('/payment',(req,res) => {
+    const amount = parseFloat(req.body.amount);
+    console.log(amount)
+    console.log(req.user)
+    if(req.user.wallet<amount)
+    {
+        res.send("Not enough money");
+    }
+    else{
+        models.User.findOne({
+            where:{
+                id:req.user.id
+            }
+        }).then((user1)=>{
+            user1.wallet -= amount
+            user1.save()
+            models.User.findOne({
+                where:{
+                    id:req.body.toId
+                }
+            }).then((user2)=>{
+                user2.wallet += amount
+                user2.save()
+            }).then(()=>{
+                models.Payment.create({
+                    fromId:req.user.id,
+                    toId:req.body.toId,
+                    amount:amount,
+                    paid:true
+                }).then(()=>{
+                    res.send("Success")
+                })
+            })
+        })
+    }
+})
+
+router.post('/rechargeWallet',(req,res)=>{
+    if(req.user.userType=='admin'){
+        models.User.findOne({
+            where:{
+                id:req.body.toId
+            }
+        }).then((user)=>{
+            user.wallet+=parseFloat(req.body.amount)
+            user.save()
+            res.json({
+                status_code:200
+            })
+        })
+    }
+    else{
+        res.send("Unauthorized")
+    }
+})
 
 module.exports = router;
