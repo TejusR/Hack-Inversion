@@ -101,7 +101,7 @@ router.post('/getShops', function(req, res) {
         }
     });
     shops.then(response => {
-        let shops_ = json(response);
+        let shops_ = jsonify(response);
         shops_ = shops_.sort((a, b) => {
             return (
                 getDistanceFromLatLonInKm(a.latitude, a.longitude, latitude, longitude) -
@@ -177,5 +177,30 @@ router.post('/confirmPayment', function(req, res) {
         });
     });
 });
+
+
+router.get('/payments', function (req, res) {
+    models.Payment.findAll({
+        where: {
+            fromId: req.user.id
+        }
+    }).then(sent => {
+        sent = jsonify(sent)
+        models.Payment.findAll({
+            where: {
+                toId: req.user.id
+            }
+        }).then(received => {
+            received = jsonify(received);
+            res.json({
+                data: {
+                    sent,
+                    received
+                },
+                status_code: 200
+            })
+        })
+    })
+})
 
 module.exports = router;
