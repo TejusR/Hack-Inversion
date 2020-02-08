@@ -251,6 +251,16 @@ router.post('/createForms', (req, res) => {
         });
     }
 });
+router.post('/specificForm',(req,res)=>{
+    models.Form.findAll({
+        where:{
+            id:req.body.id
+        }
+    }).then(response => {
+        let forms = jsonify(response);
+        res.json({forms});
+    });
+});
 
 router.post('/updateForm', function(req, res) {
     res.send('hello');
