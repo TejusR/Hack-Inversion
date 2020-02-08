@@ -23,7 +23,7 @@ module.exports = {
                 type: Sequelize.STRING,
                 allowNull: false,
                 defaultValue: 'student'
-            },
+            }
         });
     },
     down: (queryInterface, Sequelize) => {

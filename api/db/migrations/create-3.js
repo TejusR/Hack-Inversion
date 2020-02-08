@@ -40,8 +40,8 @@ module.exports = {
             },
             paymentEnd: {
                 type: Sequelize.DATE,
-                allowNull: true,
-            },
+                allowNull: true
+            }
         });
     },
     down: (queryInterface, Sequelize) => {

@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
                 set: function(value) {
                     this.setDataValue('links', JSON.stringify(value));
                 }
-            },
+            }
         },
         {
             freezeTableName: true,

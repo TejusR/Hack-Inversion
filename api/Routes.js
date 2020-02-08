@@ -275,14 +275,17 @@ router.post('/initiateUserForm', function(req, res) {
 
 router.post('/updateForm', function(req, res) {
     if (req.body.name === 'Payment') {
-        s3.deleteObject({
-            Bucket: 'kira99-static',
-            Key: req.file.originalname
-        }, (err, data) => {})
+        s3.deleteObject(
+            {
+                Bucket: 'kira99-static',
+                Key: req.file.originalname
+            },
+            (err, data) => {}
+        );
         res.json({
             status_code: 401,
-            data: "You are not allowed to upload Payments file"
-        })
+            data: 'You are not allowed to upload Payments file'
+        });
         return;
     }
     models.UserForm.findOne({
@@ -304,60 +307,21 @@ router.post('/updateForm', function(req, res) {
                 res.json({
                     status_code: 401,
                     data: 'Invalid name'
-                })
+                });
                 return;
             }
-            criteria = criteria[0]
+            criteria = criteria[0];
             let found = false;
             if (form.submitted === null) form.submitted = [];
             for (let crit of form.submitted) {
                 if (crit.name === req.body.name) {
-                    s3.deleteObject({
-                        Bucket: 'kira99-static',
-                        Key: req.file.originalname
-                    }, (err, data) => {})
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)
-                form.submitted.push({
-                    ...criteria,
-                    link: req.file.originalname
-                });
-            userForm.submitted = form.submitted;
-            if (userForm.submitted.length === resp.Required.length) userForm.completed = true;
-            userForm.save();
-            res.json({
-                form: jsonify(userForm)
-            });
-        });
-    });
-});
-
-router.post('/getIncompleteForms', function(req, res) {
-    models.UserForm.findAll({
-        where: {
-            userid: req.user.id,
-            completed: false
-        }
-    }).then(userForm => {
-        userForm = jsonify(userForm);
-        models.Form.findOne({
-            where: {
-                id: userForm.formid
-            }
-        }).then(resp => {
-            resp = jsonify(resp);
-            let criteria = resp.Required.filter(r => r.name === req.body.name)[0];
-            let found = false;
-            if (form.submitted === null) form.submitted = [];
-            for (let crit of form.submitted) {
-                if (crit.name === req.body.name) {
-                    s3.deleteObject({
-                        Bucket: 'kira99-static',
-                        Key: req.file.originalname
-                    }, (err, data) => {})
+                    s3.deleteObject(
+                        {
+                            Bucket: 'kira99-static',
+                            Key: req.file.originalname
+                        },
+                        (err, data) => {}
+                    );
                     found = true;
                     break;
                 }
