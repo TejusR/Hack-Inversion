@@ -28,15 +28,6 @@ module.exports = {
                 set: function(value) {
                     this.setDataValue('links', JSON.stringify(value));
                 }
-            },
-            createdAt: {
-                allowNull: false,
-                type: Sequelize.DATE,
-                defaultValue: Sequelize.NOW()
-            },
-            updatedAt: {
-                allowNull: false,
-                type: Sequelize.DATE
             }
         });
     },

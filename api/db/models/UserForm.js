@@ -42,20 +42,12 @@ module.exports = (sequelize, Sequelize) => {
             verified: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: false
-            },
-            createdAt: {
-                allowNull: false,
-                type: DataTypes.DATE,
-                defaultValue: Sequelize.NOW()
-            },
-            updatedAt: {
-                allowNull: false,
-                type: DataTypes.DATE
             }
         },
         {
             freezeTableName: true,
-            tableName: 'UserForm'
+            tableName: 'UserForm',
+            timestamps: false
         }
     );
     UserForm.associate = function(models) {

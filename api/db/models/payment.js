@@ -42,18 +42,11 @@ module.exports = (sequelize, DataTypes) => {
             paymentEnd: {
                 type: DataTypes.DATE,
                 allowNull: true
-            },
-            createdAt: {
-                allowNull: false,
-                type: DataTypes.DATE,
-                defaultValue: Sequelize.NOW()
-            },
-            updatedAt: {
-                allowNull: false,
-                type: DataTypes.DATE
             }
         },
-        {}
+        {
+            timestamps: false
+        }
     );
     Payment.associate = function(models) {
         // associations can be defined here

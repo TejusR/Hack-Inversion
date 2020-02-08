@@ -30,18 +30,10 @@ module.exports = (sequelize, DataTypes) => {
                     this.setDataValue('links', JSON.stringify(value));
                 }
             },
-            createdAt: {
-                allowNull: false,
-                type: DataTypes.DATE,
-                defaultValue: Sequelize.NOW()
-            },
-            updatedAt: {
-                allowNull: false,
-                type: DataTypes.DATE
-            }
         },
         {
-            freezeTableName: true
+            freezeTableName: true,
+            timestamps: false
         }
     );
     Form.associate = function(models) {

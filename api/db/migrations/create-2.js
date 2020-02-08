@@ -24,15 +24,6 @@ module.exports = {
                 allowNull: false,
                 defaultValue: 'student'
             },
-            createdAt: {
-                allowNull: false,
-                type: Sequelize.DATE,
-                defaultValue: Sequelize.NOW()
-            },
-            updatedAt: {
-                allowNull: false,
-                type: Sequelize.DATE
-            }
         });
     },
     down: (queryInterface, Sequelize) => {
